@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { InputField, Card, Loader } from "../components";
 import { RiVoiceprintLine } from "react-icons/ri";
-import {useNavigate} from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 import { FaMicrophone } from "react-icons/fa";
 const RanderCards = ({ data, title }) => {
   if (data?.length > 0) {
@@ -16,21 +16,24 @@ function Home() {
   const [loading, setloading] = useState(false);
   const [posts, setposts] = useState(null);
   const [searchText, setsearchText] = useState("");
-   const [SearchedData,setSearchedData]=useState(null)
-   const navigate=useNavigate();
+  const [SearchedData, setSearchedData] = useState(null);
+
   useEffect(() => {
     setloading(true);
     const fetchPosts = async () => {
       try {
-        const response = await fetch("https://imgen-zeta.vercel.app/api/v1/post", {
-          method: "GET",
-          headers: {
-            "Contant-Type": "application/json",
-          },
-        });
-        if(response.ok){
-          const result=await response.json();
-          console.log(result,";;;;")
+        const response = await fetch(
+          "https://imgen-zeta.vercel.app/api/v1/post",
+          {
+            method: "GET",
+            headers: {
+              "Contant-Type": "application/json",
+            },
+          }
+        );
+        if (response.ok) {
+          const result = await response.json();
+          console.log(result, ";;;;");
           setposts(result.data.reverse());
         }
         // await response.json();
@@ -43,71 +46,72 @@ function Home() {
     };
     fetchPosts();
   }, []);
- 
-   const handlesearch=(e)=>{
-   setsearchText(e.target.value) ;
 
-   setTimeout(()=>{
-  const searchresult=posts.filter((itm)=>itm.name.toLowerCase().includes(searchText.toLowerCase())||
-  itm.prompt.toLowerCase().includes(searchText.toLowerCase()));
+  const handlesearch = (e) => {
+    setsearchText(e.target.value);
 
-   setSearchedData(searchresult)
-   },500)
-   }
+    setTimeout(() => {
+      const searchresult = posts.filter(
+        (itm) =>
+          itm.name.toLowerCase().includes(searchText.toLowerCase()) ||
+          itm.prompt.toLowerCase().includes(searchText.toLowerCase())
+      );
 
+      setSearchedData(searchresult);
+    }, 500);
+  };
+  const [isListening, setIsListening] = useState(false);
 
+  useEffect(() => {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
 
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
 
-   const [isListening, setIsListening] = useState(false);
+      recognition.continuous = true;
+      recognition.interimResults = false;
+      recognition.lang = "en-US";
 
-   useEffect(() => {
+      recognition.onresult = (event) => {
+        const transcript = Array.from(event.results)
+          .map((result) => result[0].transcript)
+          .join("");
+        setsearchText(transcript.split(".")[0].toLowerCase());
+        const searchresult = posts.filter(
+          (itm) =>
+            itm.name
+              .toLowerCase()
+              .includes(transcript.split(".")[0].toLowerCase()) ||
+            itm.prompt
+              .toLowerCase()
+              .includes(transcript.split(".")[0].toLowerCase())
+        );
 
-     const SpeechRecognition =
-       window.SpeechRecognition || window.webkitSpeechRecognition;
- 
-     if (SpeechRecognition) {
-       const recognition = new SpeechRecognition();
- 
-       recognition.continuous = true; 
-       recognition.interimResults = false; 
-       recognition.lang = 'en-US'; 
- 
-       recognition.onresult = (event) => {
-         const transcript = Array.from(event.results)
-           .map((result) => result[0].transcript)
-           .join('');
-           setsearchText(transcript.split('.')[0].toLowerCase());
-           const searchresult=posts.filter((itm)=>itm.name.toLowerCase().includes(transcript.split('.')[0].toLowerCase())||
-           itm.prompt.toLowerCase().includes(transcript.split('.')[0].toLowerCase()));
-         
-            setSearchedData(searchresult)
-       };
- 
-       recognition.onerror = (event) => {
-         console.error('Error occurred in recognition: ' + event.error);
-         setIsListening(false)
-       };
- 
-       if (isListening) {
-         recognition.start();
-         console.log('Speech recognition started.');
-       } else {
-         recognition.stop();
-         console.log('Speech recognition stopped.');
-       }
- 
- 
-       return () => {
-         recognition.stop();
+        setSearchedData(searchresult);
+      };
+
+      recognition.onerror = (event) => {
+        setIsListening(false);
+      };
+
+      if (isListening) {
+        recognition.start();
+      } else {
+        recognition.stop();
+      }
+
+      return () => {
+        recognition.stop();
         //  setIsListening(false)
-       };
-     } else {
-       alert('Sorry, your browser does not support Speech Recognition.');
-     }
-   }, [isListening]); 
+      };
+    } else {
+      alert("Sorry, your browser does not support Speech Recognition.");
+    }
+  }, [isListening]);
 
-   const handleListen = () => {
-    setIsListening((prevState) => !prevState); 
+  const handleListen = () => {
+    setIsListening((prevState) => !prevState);
   };
   return (
     <section className=" max-w-7xl mx-auto">
@@ -121,18 +125,27 @@ function Home() {
         </p>
       </div>
       <div className="mt-16 flex w-full gap-2">
-<div className="w-[95%]">
-        <InputField 
-        labelName={"  Search"}
-          type={'text'}
-          name="searchtext"
-          placeholder={"Search posts by typing or by voice"}
-          value={searchText}
-          handlechange={handlesearch}
-        />
+        <div className="w-[95%]">
+          <InputField
+            labelName={"  Search"}
+            type={"text"}
+            name="searchtext"
+            placeholder={"Search posts by typing or by voice"}
+            value={searchText}
+            handlechange={handlesearch}
+          />
         </div>
-      
-        <button onClick={handleListen} className="bg-[#3062ea] rounded-md py-[8px] px-2 shadow-lg  self-center mt-6 flex justify-center items-center w-[5%]">{!isListening?<FaMicrophone className="text-[25px] text-white"/>:<RiVoiceprintLine className="text-[25px] text-white" />}</button>
+
+        <button
+          onClick={handleListen}
+          className="bg-[#3062ea] rounded-md py-[8px] px-2 shadow-lg  self-center mt-6 flex justify-center items-center w-[5%]"
+        >
+          {!isListening ? (
+            <FaMicrophone className="text-[25px] text-white" />
+          ) : (
+            <RiVoiceprintLine className="text-[25px] text-white" />
+          )}
+        </button>
       </div>
 
       <div className="mt-10">
@@ -149,10 +162,12 @@ function Home() {
               </h2>
             )}
 
-            <div
-              className="grid lg:grid-cols-4 sm:grid-cols-3 xs:grid-cols-2 grid-cols-1 gap-3" >
+            <div className="grid lg:grid-cols-4 sm:grid-cols-3 xs:grid-cols-2 grid-cols-1 gap-3">
               {searchText ? (
-                <RanderCards data={SearchedData} title="No Search results found" />
+                <RanderCards
+                  data={SearchedData}
+                  title="No Search results found"
+                />
               ) : (
                 <RanderCards data={posts} title="No posts found" />
               )}

@@ -1,5 +1,3 @@
-import express from "express";
-import * as dotenv from "dotenv";
 import { v2 as cloudinary } from "cloudinary";
 import postModel from "../models/posts.js";
 
@@ -12,7 +10,7 @@ cloudinary.config({
 const getPost = async (req, res) => {
   try {
     const posts = await postModel.find({});
-    // console.log("??",posts)
+   
    return res.status(200).json({ success: true, data: posts });
   } catch (err) {
     return res.status(500).json({ success: false, message: err });
@@ -21,9 +19,9 @@ const getPost = async (req, res) => {
 const createPost = async (req, res) => {
   try {
     const { name, prompt, photo } = req.body;
-    console.log("----",req.body)
+
     const photoUrl = await cloudinary.uploader.upload(photo);
-console.log(photoUrl,";;;;")
+
     const newPost = await postModel.create({
       name,
       prompt,

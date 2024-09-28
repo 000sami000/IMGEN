@@ -38,7 +38,7 @@ function CreatePost() {
      }
   };
   const handlechange = (e) => {
-    console.log(e.target.value);
+   
     setformdata({ ...formdata, [e.target.name]: e.target.value });
   };
   const generateImg = async () => {
@@ -46,7 +46,7 @@ function CreatePost() {
     if (formdata.prompt) {
       try {
         setgeneratingImg(true);
-        const response = await fetch("http://localhost:3000/api/v1/ai/", {
+        const response = await fetch("https://imgen-zeta.vercel.app/api/v1/ai/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -56,7 +56,7 @@ function CreatePost() {
         const data = await response.json();
         console.log(data)
         if(data.photo){
-          console.log("data---==",data.photo)
+
 
           setformdata({
             ...formdata,
@@ -68,7 +68,7 @@ function CreatePost() {
           alert(data.err);
         }
       } catch (err) {
-        console.log("llll",err)
+        console.log("generate image err--",err)
       } finally {
         setgeneratingImg(false);
       }
