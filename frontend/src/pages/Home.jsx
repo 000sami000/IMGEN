@@ -22,7 +22,7 @@ function Home() {
     setloading(true);
     const fetchPosts = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/v1/post", {
+        const response = await fetch("https://imgen-zeta.vercel.app/api/v1/post", {
           method: "GET",
           headers: {
             "Contant-Type": "application/json",

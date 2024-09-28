@@ -16,7 +16,7 @@ app.use(express.json({limit:'50mb'}))
 app.use("/api/v1/post",postRoutes);
 app.use("/api/v1/ai",aiRoutes);
 app.get('/',async (req,res)=>{
-    res.status(200).json({message:"ok  brooo"})
+    res.status(200).json({message:"app is running"})
     
 })
 
